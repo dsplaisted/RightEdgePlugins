@@ -28,9 +28,9 @@ namespace IQFeed
 		private iqFeedCallBack _myCallBack;
 		private ManualResetEvent _registerDone = new ManualResetEvent(false);
 
-		private string strName = "IQFEED_DEMO";
+		//private string strName = "IQFEED_DEMO";
 		private string strVersion = "1.0";	// Picked up dynamically in the constructor
-		private string strKey = "1.0";
+		//private string strKey = "1.0";
 
 
 		int clientId;
@@ -59,7 +59,7 @@ namespace IQFeed
 			}
 
 			_registerDone.Reset();
-			int ret = RegisterClientApp(clientId, strName, strKey, strVersion);
+			int ret = RegisterClientApp(clientId, IQFeedConnectInfo.ProductName, IQFeedConnectInfo.Key, strVersion);
 			while (!_registerDone.WaitOne(50, true))
 			{
 				//System.Windows.Forms.Application.DoEvents();

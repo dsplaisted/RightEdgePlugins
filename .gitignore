@@ -41,6 +41,9 @@ httpd.parse.errors
 # Office Temp Files
 ~$*
  
+# Miscellaneous
+IQFeedConnectInfo.cs
+
 # If you have a deploy folder
 # deploy
 # deploy/*
