@@ -4357,7 +4357,8 @@ namespace Krs.Ats.IBNet
 				if (ex is OverflowException)
 				{
 					double value;
-					if (double.TryParse(str, out value) && value == double.MaxValue)
+					//	IB sometimes sends 1.7976931348623157E308, which is close to double.MaxValue, but not exactly the same
+					if (double.TryParse(str, NumberStyles.Float, CultureInfo.InvariantCulture, out value) && value > (double) decimal.MaxValue)
 					{
 						return decimal.MaxValue;
 					}
@@ -4373,8 +4374,10 @@ namespace Krs.Ats.IBNet
 					{
 						msg = "Invalid decimal value while reading " + desc + ": " + str;
 					}
-					log.Error(msg);
-					throw new InvalidDataException(msg, ex);
+                    //Console.WriteLine(msg);
+                    //return decimal.MaxValue;
+                    log.Error(msg);
+                    throw new InvalidDataException(msg, ex);
 				}
 				else
 				{

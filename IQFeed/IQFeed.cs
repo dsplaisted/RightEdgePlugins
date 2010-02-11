@@ -422,6 +422,11 @@ namespace IQFeed
 			TimeSpan ts = endDate - startDate;
 			string symbolName = FormatSymbol(symbol);
 
+            //  IQFeed updated their api, we should update to the new protocol at some point
+            //  HM -> HID
+            //  HD -> HDX
+            //  HW -> HWX
+            //  HN -> HNX
 			if (frequency < 1440)
 			{
 				_histRequest = "HM," + symbolName + "," + ts.Days.ToString() + "," + frequency.ToString();

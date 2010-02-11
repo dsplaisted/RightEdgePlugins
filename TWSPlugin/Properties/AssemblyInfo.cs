@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Yye Software")]
 [assembly: AssemblyProduct("TWS Plugin for RightEdge")]
-[assembly: AssemblyCopyright("Copyright © Yye Software 2006-2007")]
+[assembly: AssemblyCopyright("Copyright © Yye Software 2006-2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -44,7 +44,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly : AssemblyVersion("2008.2.0.0")]
+[assembly : AssemblyVersion("2010.1.0.0")]
 
 
 //CLS Compliant

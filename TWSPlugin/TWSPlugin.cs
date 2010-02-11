@@ -356,9 +356,14 @@ namespace RightEdge.TWSCSharpPlugin
 		{
 			lock (_lockObject)
 			{
+				//	You can use e.Key == "NetLiquidation" instead if preferred
 				if (e.Key == "BuyingPower")
 				{
-					buyingPower = Convert.ToDouble(e.Value);
+					buyingPower = Convert.ToDouble(e.Value, CultureInfo.InvariantCulture);
+				}
+				else
+				{
+					//Trace.WriteLine(string.Format("TWS {0}: {1} {2}", e.Key, e.Value, e.Currency));
 				}
 			}
 		}
@@ -672,8 +677,11 @@ namespace RightEdge.TWSCSharpPlugin
 					{
 						if (errorCode >= 2100 && errorCode <= 3000)
 						{
-							//	It's probably just a warning, and the order may continue
-							Console.WriteLine("IB Warning code " + errorCode + " for order ID " + e.TickerId + ": " + e.ErrorMsg);
+							if (errorCode != 2109)
+							{
+								//	It's probably just a warning, and the order may continue
+								Console.WriteLine("IB Warning code " + errorCode + " for order ID " + e.TickerId + ": " + e.ErrorMsg);
+							}
 							return;
 						}
 
