@@ -7,7 +7,32 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KRS.ATS.IBNet", "KRS.ATS.IB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TWSCSharpPlugin", "TWSPlugin\TWSCSharpPlugin.csproj", "{98672E16-97B1-4204-86CC-EA0009CA15F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStorage", "DataStorage\DataStorage.csproj", "{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}"
+EndProject
 Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 4
+		SccProjectUniqueName0 = IQFeed\\IQFeed.csproj
+		SccProjectName0 = $/RightEdge2008\u0020Edition\u00202
+		SccLocalPath0 = IQFeed
+		SccProvider0 = MSSCCI:SourceGear\u0020Vault\u0020Client
+		CanCheckoutShared = false
+		SccProjectUniqueName1 = KRS.ATS.IBNet\\KRS.ATS.IBNet.csproj
+		SccProjectName1 = $/RightEdge2008\u0020Edition\u00202/KRS.ATS.IBNet
+		SccLocalPath1 = KRS.ATS.IBNet
+		SccProvider1 = MSSCCI:SourceGear\u0020Vault\u0020Client
+		CanCheckoutShared = false
+		SccProjectUniqueName2 = TWSPlugin\\TWSCSharpPlugin.csproj
+		SccProjectName2 = $/RightEdge2008\u0020Edition\u00202/TWSCSharpPlugin
+		SccLocalPath2 = TWSPlugin
+		SccProvider2 = MSSCCI:SourceGear\u0020Vault\u0020Client
+		CanCheckoutShared = false
+		SccProjectUniqueName3 = DataStorage\\DataStorage.csproj
+		SccProjectName3 = $/RightEdge2008\u0020Edition\u00202/DataStorage
+		SccLocalPath3 = DataStorage
+		SccProvider3 = MSSCCI:SourceGear\u0020Vault\u0020Client
+		CanCheckoutShared = false
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -25,6 +50,10 @@ Global
 		{98672E16-97B1-4204-86CC-EA0009CA15F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98672E16-97B1-4204-86CC-EA0009CA15F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98672E16-97B1-4204-86CC-EA0009CA15F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
