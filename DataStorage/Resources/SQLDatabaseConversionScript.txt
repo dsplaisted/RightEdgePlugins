@@ -1,0 +1,61 @@
+﻿-- Converts symbols that exist in the BarData 
+INSERT INTO [NEW_DATABASE].dbo.Symbol (SymbolGuid, SymbolUniqueID)
+SELECT
+NEWID() as SymbolGuid,
+SUBSTRING(SymbolID, 0, LEN(SymbolID) - CHARINDEX('!', REVERSE(SymbolID)) + 1) As SymbolID
+FROM [OLD_DATABASE].[dbo].[BarData]
+WHERE SymbolID NOT IN (SELECT SymbolUniqueID FROM [NEW_DATABASE].dbo.Symbol)
+GROUP BY SymbolID
+GO
+
+-- Converts symbols that exist in the TickData
+INSERT INTO [NEW_DATABASE].dbo.Symbol (SymbolGuid, SymbolUniqueID)
+SELECT 
+NEWID() as SymbolGuid,
+SymbolID
+FROM [OLD_DATABASE].[dbo].[TickData]
+WHERE SymbolID NOT IN (SELECT SymbolUniqueID FROM [NEW_DATABASE].dbo.Symbol)
+GROUP BY SymbolID
+GO
+
+-- Converts BarData into Bar
+INSERT INTO [NEW_DATABASE].dbo.Bar (SymbolGuid, Frequency, BarStartTime, [Order], [Open], [Close], [High], [Low], [Bid], [Ask], [Volume], [OpenInterest], [EmptyBar])
+SELECT [NEW_DATABASE].dbo.Symbol.SymbolGuid,
+      CAST(SUBSTRING(SymbolID, LEN(SymbolID) - CHARINDEX('!', REVERSE(SymbolID)) + 2, LEN(SymbolID) - 2) As int) As Frequency,
+      old.BarDateTime,
+      ROW_NUMBER() OVER
+	    (
+			PARTITION BY old.SymbolID, old.BarDateTime
+			ORDER BY old.BarDataId
+		) - 1 As [Order],
+      old.[Open],
+      old.[Close],
+      old.[High],
+      old.[Low],
+      old.[Bid],
+      old.[Ask],
+      old.[Volume],
+      old.[OpenInterest],
+      old.[EmptyBar]
+FROM [OLD_DATABASE].dbo.BarData AS old
+INNER JOIN [NEW_DATABASE].dbo.Symbol
+ON SUBSTRING(SymbolID, 0, LEN(SymbolID) - CHARINDEX('!', REVERSE(SymbolID)) + 1) = [NEW_DATABASE].dbo.Symbol.SymbolUniqueID
+GO
+
+
+-- Finally, convert tick data
+INSERT INTO [NEW_DATABASE].dbo.Tick
+(SymbolGuid, [Time], [Order], TickType, Price, Size)
+SELECT [NEW_DATABASE].dbo.Symbol.SymbolGuid,
+      old.[Time],
+      ROW_NUMBER() OVER
+	    (
+			PARTITION BY old.SymbolID, old.Time
+			ORDER BY old.TickDataId
+		) - 1 As [Order],
+      old.[TickType],
+      old.[Price],
+      old.[Size]
+FROM [OLD_DATABASE].dbo.TickData As old
+INNER JOIN [NEW_DATABASE].dbo.Symbol ON old.SymbolID = [NEW_DATABASE].dbo.Symbol.SymbolUniqueID
+GO

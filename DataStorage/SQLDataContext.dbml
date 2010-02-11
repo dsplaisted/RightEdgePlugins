@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database Name="RIGHTEDGE_DATA" Class="SQLDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=DEEPBLUE7\SQLEXPRESS;Initial Catalog=RIGHTEDGE_DATA;User ID=sa;Pooling=False" SettingsObjectName="RightEdge.DataStorage.Properties.Settings" SettingsPropertyName="RIGHTEDGE_DATAConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Bar" Member="DBBars">
+    <Type Name="DBBar">
+      <Column Name="SymbolGuid" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Frequency" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="BarStartTime" Type="System.DateTime" DbType="DateTime NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="[Order]" Member="Order" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="[Open]" Member="Open" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="[Close]" Member="Close" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="High" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Low" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Bid" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Ask" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Volume" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="OpenInterest" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="EmptyBar" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="DBSymbol_DBBar" Member="DBSymbol" ThisKey="SymbolGuid" OtherKey="SymbolGuid" Type="DBSymbol" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Symbol" Member="DBSymbols">
+    <Type Name="DBSymbol">
+      <Column Name="SymbolGuid" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="SymbolUniqueID" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Association Name="DBSymbol_DBBar" Member="DBBars" ThisKey="SymbolGuid" OtherKey="SymbolGuid" Type="DBBar" />
+      <Association Name="DBSymbol_Tick" Member="DBTicks" ThisKey="SymbolGuid" OtherKey="SymbolGuid" Type="DBTick" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Tick" Member="DBTicks">
+    <Type Name="DBTick">
+      <Column Name="SymbolGuid" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Time" Type="System.DateTime" DbType="DateTime NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="[Order]" Member="Order" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="TickType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Size" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="DBSymbol_Tick" Member="DBSymbol" ThisKey="SymbolGuid" OtherKey="SymbolGuid" Type="DBSymbol" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Function Name="dbo.DeleteBars" Method="DeleteBars">
+    <Parameter Name="SymbolGuid" Parameter="symbolGuid" Type="System.Guid" DbType="UniqueIdentifier" />
+    <Parameter Name="Frequency" Parameter="frequency" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Start" Parameter="start" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="End" Parameter="end" Type="System.DateTime" DbType="DateTime" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.DeleteTicks" Method="DeleteTicks">
+    <Parameter Name="SymbolGuid" Parameter="symbolGuid" Type="System.Guid" DbType="UniqueIdentifier" />
+    <Parameter Name="Start" Parameter="start" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="End" Parameter="end" Type="System.DateTime" DbType="DateTime" />
+    <Return Type="System.Int32" />
+  </Function>
+</Database>

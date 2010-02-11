@@ -1,0 +1,130 @@
+﻿USE [RIGHTEDGE_DATA]
+GO
+/****** Object:  Table [dbo].[Symbol]    Script Date: 01/31/2010 20:33:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Symbol](
+	[SymbolGuid] [uniqueidentifier] NOT NULL,
+	[SymbolUniqueID] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_Symbol] PRIMARY KEY CLUSTERED 
+(
+	[SymbolGuid] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Symbol] ADD  CONSTRAINT [DF_Symbol_SymbolGuid]  DEFAULT (newid()) FOR [SymbolGuid]
+GO
+/****** Object:  Table [dbo].[RightEdgeDatabaseVersion]    Script Date: 01/31/2010 20:33:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RightEdgeDatabaseVersion](
+	[Version] [int] NOT NULL
+) ON [PRIMARY]
+GO
+INSERT INTO RightEdgeDatabaseVersion ([Version]) VALUES (1)
+GO
+/****** Object:  Table [dbo].[Tick]    Script Date: 01/31/2010 20:33:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Tick](
+	[SymbolGuid] [uniqueidentifier] NOT NULL,
+	[Time] [datetime] NOT NULL,
+	[Order] [int] NOT NULL,
+	[TickType] [int] NOT NULL,
+	[Price] [float] NOT NULL,
+	[Size] [bigint] NOT NULL,
+ CONSTRAINT [PK_Tick] PRIMARY KEY CLUSTERED 
+(
+	[SymbolGuid] ASC,
+	[Time] ASC,
+	[Order] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Bar]    Script Date: 01/31/2010 20:33:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Bar](
+	[SymbolGuid] [uniqueidentifier] NOT NULL,
+	[Frequency] [int] NOT NULL,
+	[BarStartTime] [datetime] NOT NULL,
+	[Order] [int] NOT NULL,
+	[Open] [float] NOT NULL,
+	[Close] [float] NOT NULL,
+	[High] [float] NOT NULL,
+	[Low] [float] NOT NULL,
+	[Bid] [float] NOT NULL,
+	[Ask] [float] NOT NULL,
+	[Volume] [bigint] NOT NULL,
+	[OpenInterest] [int] NOT NULL,
+	[EmptyBar] [bit] NOT NULL,
+ CONSTRAINT [PK_Bar] PRIMARY KEY CLUSTERED 
+(
+	[SymbolGuid] ASC,
+	[Frequency] ASC,
+	[BarStartTime] ASC,
+	[Order] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  StoredProcedure [dbo].[DeleteTicks]    Script Date: 01/31/2010 20:33:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteTicks]
+	(
+	@SymbolGuid uniqueidentifier,
+	@Start datetime,
+	@End datetime
+	)
+AS
+	SET NOCOUNT ON
+	DELETE FROM Tick WHERE
+		SymbolGuid = @SymbolGuid AND
+		[Time] >= @Start AND
+		[Time] <= @End
+	RETURN
+GO
+/****** Object:  StoredProcedure [dbo].[DeleteBars]    Script Date: 01/31/2010 20:33:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteBars]
+	(
+	@SymbolGuid uniqueidentifier,
+	@Frequency int,
+	@Start datetime,
+	@End datetime
+	)
+AS
+BEGIN
+	SET NOCOUNT ON
+	DELETE FROM Bar WHERE
+		SymbolGuid = @SymbolGuid AND
+		Frequency = @Frequency AND
+		BarStartTime >= @Start AND
+		BarStartTime <= @End
+END
+GO
+/****** Object:  ForeignKey [FK_BarData_Symbols]    Script Date: 01/31/2010 20:33:38 ******/
+ALTER TABLE [dbo].[Bar]  WITH CHECK ADD  CONSTRAINT [FK_BarData_Symbols] FOREIGN KEY([SymbolGuid])
+REFERENCES [dbo].[Symbol] ([SymbolGuid])
+GO
+ALTER TABLE [dbo].[Bar] CHECK CONSTRAINT [FK_BarData_Symbols]
+GO
+/****** Object:  ForeignKey [FK_Tick_Symbol]    Script Date: 01/31/2010 20:33:38 ******/
+ALTER TABLE [dbo].[Tick]  WITH CHECK ADD  CONSTRAINT [FK_Tick_Symbol] FOREIGN KEY([SymbolGuid])
+REFERENCES [dbo].[Symbol] ([SymbolGuid])
+GO
+ALTER TABLE [dbo].[Tick] CHECK CONSTRAINT [FK_Tick_Symbol]
+GO

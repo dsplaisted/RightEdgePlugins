@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="DataClasses1">
+  <DataContextMoniker Name="/SQLDataContext" />
+  <nestedChildShapes>
+    <classShape Id="97b05cf2-1fb2-4b58-bb13-d4d690cd305e" absoluteBounds="3.5, 1, 2, 3.3093082682291666">
+      <DataClassMoniker Name="/SQLDataContext/DBBar" />
+      <nestedChildShapes>
+        <elementListCompartment Id="49533b29-8d98-425b-9006-1bb0a0630f64" absoluteBounds="3.515, 1.46, 1.9700000000000002, 2.7493082682291665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="53bf5163-cd67-43ce-99da-426eb01f406c" absoluteBounds="0.75, 2, 2, 1.1939925130208335">
+      <DataClassMoniker Name="/SQLDataContext/DBSymbol" />
+      <nestedChildShapes>
+        <elementListCompartment Id="330ce8ce-efbe-41fc-8467-a009bbe2ef5b" absoluteBounds="0.765, 2.46, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(2.75 : 2.59699625651042); (3.5 : 2.59699625651042)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/SQLDataContext/DBSymbol/DBSymbol_DBBar" />
+      <nodes>
+        <classShapeMoniker Id="53bf5163-cd67-43ce-99da-426eb01f406c" />
+        <classShapeMoniker Id="97b05cf2-1fb2-4b58-bb13-d4d690cd305e" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="06fb5d24-e2c2-456e-9804-d913f6dbc6a1" absoluteBounds="3.875, 5.375, 2, 1.9631982421875">
+      <DataClassMoniker Name="/SQLDataContext/DBTick" />
+      <nestedChildShapes>
+        <elementListCompartment Id="bcaf922e-0e92-427a-9691-2ad894f816c6" absoluteBounds="3.89, 5.835, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(1.75 : 3.19399251302083); (1.75 : 6.35659912109375); (3.875 : 6.35659912109375)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/SQLDataContext/DBSymbol/DBSymbol_Tick" />
+      <nodes>
+        <classShapeMoniker Id="53bf5163-cd67-43ce-99da-426eb01f406c" />
+        <classShapeMoniker Id="06fb5d24-e2c2-456e-9804-d913f6dbc6a1" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>
