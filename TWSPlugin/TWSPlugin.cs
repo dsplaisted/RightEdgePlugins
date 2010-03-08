@@ -1,5 +1,3 @@
-//#define RE1_1
-
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,10 +9,6 @@ using KRSTickType = Krs.Ats.IBNet.TickType;
 using System.Diagnostics;
 using System.Threading;
 using System.Globalization;
-#if RE1_1
-using TransactionType = RightEdge.Common.BrokerTransactionType;
-#endif
-
 
 namespace RightEdge.TWSCSharpPlugin
 {
@@ -75,11 +69,7 @@ namespace RightEdge.TWSCSharpPlugin
 		bool bGotAccountTime = false;
 
 		private double buyingPower = 0.0;
-#if RE1_1
-		private Dictionary<string, RightEdge.Common.Order> openOrders = new Dictionary<string, RightEdge.Common.Order>();
-#else
 		private Dictionary<string, RightEdge.Common.BrokerOrder> openOrders = new Dictionary<string, RightEdge.Common.BrokerOrder>();
-#endif
 
 		//	This dictionary keeps track of orders that have been "placed", but for which
 		//	we have not received the "Submitted" order status.  If these orders are
@@ -394,11 +384,8 @@ namespace RightEdge.TWSCSharpPlugin
 
 				if (openOrders.ContainsKey(e.OrderId.ToString()))
 				{
-#if RE1_1
-				RightEdge.Common.Order openOrder = openOrders[e.OrderId.ToString()];
-#else
 					RightEdge.Common.BrokerOrder openOrder = openOrders[e.OrderId.ToString()];
-#endif
+
 					bool orderProcessed = false;
 					Fill fill = null;
 					string information = "";
@@ -409,12 +396,7 @@ namespace RightEdge.TWSCSharpPlugin
 							//	Handle fills with ExecDetails event
 //                            fill = new Fill();
 //                            fill.FillDateTime = GetAccountTime("fill");
-//#if RE1_1
-//                        fill.Price = new Price() { AccountPrice = e.LastFillPrice, SymbolPrice = e.LastFillPrice };
-//#else
 //                            fill.Price = new Price(e.LastFillPrice, e.LastFillPrice);
-//#endif
-
 //                            int alreadyFilled = 0;
 //                            foreach (Fill existingFill in openOrder.Fills)
 //                            {
@@ -547,11 +529,8 @@ namespace RightEdge.TWSCSharpPlugin
 					DateTime execDateTime = DateTime.ParseExact(dateSplit[0], "d", dateFormat).Date;
 					TimeSpan execTime = DateTime.ParseExact(dateSplit[1], "t", dateFormat).TimeOfDay;
 					execDateTime += execTime;
-#if RE1_1
-					RightEdge.Common.Order openOrder;
-#else
+
 					BrokerOrder openOrder;
-#endif
 
 					if (openOrders.TryGetValue(e.OrderId.ToString(), out openOrder))
 					{
@@ -574,13 +553,7 @@ namespace RightEdge.TWSCSharpPlugin
 
 							Fill fill = new Fill();
 							fill.FillDateTime = execDateTime;
-#if RE1_1
-						fill.Price = new Price();
-						fill.Price.AccountPrice = e.Execution.Price;
-						fill.Price.SymbolPrice = e.Execution.Price;
-#else
 							fill.Price = new Price(e.Execution.Price, e.Execution.Price);
-#endif
 							fill.Quantity = e.Execution.Shares;
 
 							//	Apparently IB doesn't send commissions
@@ -593,11 +566,7 @@ namespace RightEdge.TWSCSharpPlugin
 							{
 								totalFilled += f.Quantity;
 							}
-#if RE1_1
-						if (totalFilled < (int)openOrder.Shares)
-#else
 							if (totalFilled < openOrder.Shares)
-#endif
 							{
 								openOrder.OrderState = BrokerOrderState.PartiallyFilled;
 								information = "Partial fill";
@@ -666,12 +635,8 @@ namespace RightEdge.TWSCSharpPlugin
 						_histRetrieval.SendRequest();
 					}
 
-					// error code 202 is a cancelled order ... we want to know about these!
-#if RE1_1
-			RightEdge.Common.Order order;
-#else
+					
 					RightEdge.Common.BrokerOrder order;
-#endif
 					string information = "";
 					if (openOrders.TryGetValue(e.TickerId.ToString(), out order))
 					{
@@ -685,15 +650,18 @@ namespace RightEdge.TWSCSharpPlugin
 							return;
 						}
 
+						string message = string.Format("Error code {0}: {1}", errorCode, e.ErrorMsg);
+
+						// error code 202 is a cancelled order ... we want to know about these!
 						if (errorCode == 202)
 						{
 							order.OrderState = BrokerOrderState.Cancelled;
-							information = e.ErrorMsg;
+							information = message;
 						}
 						else
 						{
 							order.OrderState = BrokerOrderState.Rejected;
-							information = e.ErrorMsg;
+							information = message;
 						}
 						OrderUpdatedDelegate tmp = OrderUpdated;
 						if (tmp != null)
@@ -1080,11 +1048,8 @@ namespace RightEdge.TWSCSharpPlugin
 
 			return true;
 		}
-#if RE1_1
-		public bool Connect()
-#else
+
 		public bool Connect(ServiceConnectOptions connectOptions)
-#endif
 		{
 			ClearError();
 
@@ -1113,7 +1078,6 @@ namespace RightEdge.TWSCSharpPlugin
 			}
 
 			int clientID = -1;
-#if !RE1_1
 			bool brokerConnect = ((connectOptions & ServiceConnectOptions.Broker) == ServiceConnectOptions.Broker);
 			
 			if ((connectOptions & ServiceConnectOptions.Broker) == ServiceConnectOptions.Broker)
@@ -1128,7 +1092,6 @@ namespace RightEdge.TWSCSharpPlugin
 			{
 				clientID = _clientIDHist;
 			}
-#endif
 			if (clientID < 0)
 			{
 				clientID = new Random().Next();
@@ -1139,10 +1102,8 @@ namespace RightEdge.TWSCSharpPlugin
 			{
 				_connected = true;
 			}
-#if !RE1_1
 			if (brokerConnect)
 			{
-#endif
 				lock (_lockObject)
 				{
 					_connectWaitHandle = new ManualResetEvent(false);
@@ -1152,9 +1113,7 @@ namespace RightEdge.TWSCSharpPlugin
 					{
 						_potentiallyCancelledOrders[id] = null;
 					}
-#if !RE1_1
 				}
-#endif
 
 				client.RequestAccountUpdates(true, accountCode);
 				//client.ReqAllOpenOrders();
@@ -1194,11 +1153,8 @@ namespace RightEdge.TWSCSharpPlugin
 					{
 						foreach (string orderID in _potentiallyCancelledOrders.Keys)
 						{
-#if RE1_1
-						RightEdge.Common.Order order;
-#else
 							BrokerOrder order;
-#endif
+
 							if (openOrders.TryGetValue(orderID, out order))
 							{
 								order.OrderState = BrokerOrderState.Cancelled;
@@ -1489,28 +1445,8 @@ namespace RightEdge.TWSCSharpPlugin
 		}
 
 		#region IBarDataRetrieval Members
-#if RE1_1
-		public List<int> GetAvailableFrequencies()
-		{
-		    List<int> ret = new List<int>();
-		    ret.Add((int)BarFrequency.OneMinute);
-		    ret.Add((int)BarFrequency.FiveMinute);
-		    ret.Add((int)BarFrequency.FifteenMinute);
-		    ret.Add((int)BarFrequency.ThirtyMinute);
-		    ret.Add((int)BarFrequency.SixtyMinute);
-		    ret.Add((int)BarFrequency.Daily);
-		    ret.Add((int)BarFrequency.Weekly);
-		    ret.Add((int)BarFrequency.Monthly);
-		    ret.Add((int)BarFrequency.Yearly);
-		    return ret;
-		}
-#endif
 
-#if RE1_1
-		public List<BarData> RetrieveData(Symbol symbol, int frequency, AssetClass assetClass, double? strikePrice, DateTime? expirationDate, ContractType? contract, DateTime startDate, DateTime endDate)
-#else
 		public List<BarData> RetrieveData(Symbol symbol, int frequency, DateTime startDate, DateTime endDate, BarConstructionType barConstruction)
-#endif
 		{
 			if (_histRetrieval != null)
 			{
@@ -1528,11 +1464,7 @@ namespace RightEdge.TWSCSharpPlugin
 			ClearError();
 			if (!_connected)
 			{
-#if RE1_1
-				if (!Connect())
-#else
 				if (!Connect(ServiceConnectOptions.HistoricalData))
-#endif
 				{
 					return null;
 				}
@@ -1619,11 +1551,7 @@ namespace RightEdge.TWSCSharpPlugin
 				_histRetrieval.startDate = startDate;
 				_histRetrieval.endDate = endDate;
 				_histRetrieval.RTHOnly = _useRTH;
-#if RE1_1
-				_histRetrieval.BarConstruction = BarConstructionType.Last;
-#else
 				_histRetrieval.BarConstruction = barConstruction;
-#endif
 
 				_histRetrieval.waitEvent = new ManualResetEvent(false);
 
@@ -1731,7 +1659,6 @@ namespace RightEdge.TWSCSharpPlugin
 		#endregion
 
 		#region IBroker Members
-#if !RE1_1
 		public void SetAccountState(BrokerAccountState state)
 		{
 			lock (_lockObject)
@@ -1742,13 +1669,25 @@ namespace RightEdge.TWSCSharpPlugin
 				}
 			}
 		}
-#endif
 
-#if RE1_1
-		public bool SubmitOrder(RightEdge.Common.Order order, out string orderId)
-#else
+		private double RoundPrice(Symbol symbol, double price)
+		{
+			if (symbol.SymbolInformation.TickSize > 0)
+			{
+				// If a tick size is specified, round to this value.
+				return SystemUtils.RoundToNearestTick(price, symbol.SymbolInformation.TickSize);
+			}
+			else
+			{
+				// Otherwise, use decimal places specified in symbol setup.
+				double multiplier = Math.Pow(10, symbol.SymbolInformation.DecimalPlaces);
+				price = Math.Round(price * multiplier);
+				price /= multiplier;
+				return price;
+			}
+		}
+
 		public bool SubmitOrder(RightEdge.Common.BrokerOrder order, out string orderId)
-#endif
 		{
 			Krs.Ats.IBNet.Order apiOrder = new Krs.Ats.IBNet.Order();
 			Contract contract;
@@ -1760,22 +1699,8 @@ namespace RightEdge.TWSCSharpPlugin
 				// to something that IB will accept.  In other words, if a price is submitted
 				// for 40.1032988923, this will be get rejected.
 
-				if (order.LimitPrice > 0)
-				{
-					if (order.OrderSymbol.SymbolInformation.TickSize > 0)
-					{
-						// If a tick size is specified, round to this value.
-						order.LimitPrice = SystemUtils.RoundToNearestTick(order.LimitPrice, order.OrderSymbol.SymbolInformation.TickSize);
-					}
-					else
-					{
-						// Otherwise, use decimal places specified in symbol setup.
-						double multiplier = Math.Pow(10, order.OrderSymbol.SymbolInformation.DecimalPlaces);
-						order.LimitPrice = Math.Round(order.LimitPrice * multiplier);
-						order.LimitPrice /= multiplier;
-					}
-				}
-
+				order.LimitPrice = RoundPrice(order.OrderSymbol, order.LimitPrice);
+				order.StopPrice = RoundPrice(order.OrderSymbol, order.StopPrice);
 
 				contract = TWSAssetArgs.Create(order.OrderSymbol).ToContract();
 
@@ -1838,7 +1763,6 @@ namespace RightEdge.TWSCSharpPlugin
 						limitPrice = order.LimitPrice;
 						break;
 
-#if !RE1_1
 					//	TODO: investigate and add support for trailing stop
 					case RightEdge.Common.OrderType.TrailingStop:
 						if (order.TrailingStopType != TargetPriceType.RelativePrice)
@@ -1850,7 +1774,6 @@ namespace RightEdge.TWSCSharpPlugin
 						apiOrder.OrderType = Krs.Ats.IBNet.OrderType.TrailingStop;
 						auxPrice = order.TrailingStop;
 						break;
-#endif
 					default:
 						lastError = "Order type not supported by IB service: " + order.OrderType.ToString();
 						orderId = null;
@@ -1910,11 +1833,8 @@ namespace RightEdge.TWSCSharpPlugin
 			return true;
 
 		}
-#if RE1_1
-		private bool internalCancelOrder(int id, RightEdge.Common.Order order)
-#else
+
 		private bool internalCancelOrder(int id, RightEdge.Common.BrokerOrder order)
-#endif
 		{
 			Monitor.Exit(_lockObject);
 			try
@@ -2013,12 +1933,7 @@ namespace RightEdge.TWSCSharpPlugin
 				return 0.0;
 			}
 		}
-#if RE1_1
-		public List<RightEdge.Common.Order> GetOpenOrders()
-		{
-			return new List<RightEdge.Common.Order>(openOrders.Values);
-		}
-#else
+
 		public List<RightEdge.Common.BrokerOrder> GetOpenOrders()
 		{
 			lock (_lockObject)
@@ -2026,17 +1941,10 @@ namespace RightEdge.TWSCSharpPlugin
 				return new List<RightEdge.Common.BrokerOrder>(openOrders.Values);
 			}
 		}
-#endif
 
-#if RE1_1
-		public RightEdge.Common.Order GetOpenOrder(string id)
-		{
-			RightEdge.Common.Order ret;
-#else
 		public RightEdge.Common.BrokerOrder GetOpenOrder(string id)
 		{
 			RightEdge.Common.BrokerOrder ret;
-#endif
 			lock (_lockObject)
 			{
 				if (openOrders.TryGetValue(id, out ret))

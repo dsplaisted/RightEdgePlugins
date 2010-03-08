@@ -15,67 +15,84 @@ namespace RightEdge.DataStorage
 	/// <summary>
 	/// Summary description for SQLServerStorage.
 	/// </summary>
+	[ExcludedPlugin]
 	public class SQLServerStorage : IBarDataStorage
 	{
 		private string lastError = "";
-		private string connectionString = "";
-		private string server = "";
-		private string database = "";
-		private string userName = "";
-		private string password = "";
+		//private string connectionString = "";
+		public string Server { get; set; }
+		public string Database { get; set; }
+		public string UserName { get; set; }
+		public string Password { get; set; }
+		public bool SqlAuth { get; set; }
 
-		private bool sqlAuth = false;
-
-		private SqlConnection connection = null;
+		private bool _useRegistry;
 
 		public SQLServerStorage()
+			: this(true)
 		{
-			try
+
+		}
+
+		public SQLServerStorage(bool useRegistry)
+		{
+			Server = string.Empty;
+			Database = string.Empty;
+			UserName = string.Empty;
+			Password = string.Empty;
+
+			_useRegistry = useRegistry;
+			if (useRegistry)
 			{
-				RegistryKey regKey = Registry.CurrentUser.OpenSubKey(@"Software\Yye Software\SQLServerDataStore");
-				if (regKey != null)
+				try
 				{
-					if (regKey.GetValue("Server") != null)
+					RegistryKey regKey = Registry.CurrentUser.OpenSubKey(@"Software\Yye Software\SQLServerDataStore");
+					if (regKey != null)
 					{
-						server = regKey.GetValue("Server").ToString();
-						database = regKey.GetValue("Database").ToString();
-						userName = regKey.GetValue("LoginName").ToString();
-						password = regKey.GetValue("Password").ToString();
-						sqlAuth = Convert.ToBoolean(regKey.GetValue("SQLAuth"));
+						if (regKey.GetValue("Server") != null)
+						{
+							Server = regKey.GetValue("Server").ToString();
+							Database = regKey.GetValue("Database").ToString();
+							UserName = regKey.GetValue("LoginName").ToString();
+							Password = regKey.GetValue("Password").ToString();
+							SqlAuth = Convert.ToBoolean(regKey.GetValue("SQLAuth"));
+						}
 
-						if (sqlAuth)
-						{
-							connectionString = "Data Source=" + server + ";Initial Catalog=" + database + ";user id=" + userName + ";password=" + password + ";";
-						}
-						else
-						{
-							connectionString = "Data Source=" + server + ";Initial Catalog=" + database + ";Integrated Security=SSPI;";
-						}
+						regKey.Close();
 					}
-
-					regKey.Close();
+				}
+				catch (Exception exception)
+				{
+					// Don't really care about the exception, just ignore
+					Trace.WriteLine("Exception message: " + exception.Message);
+					Trace.WriteLine("Exception InnerException: " + exception.InnerException);
+					Trace.WriteLine("Stack Trace follows:");
+					Trace.WriteLine(exception.StackTrace);
+					Trace.Flush();
+					string s = exception.Message;
 				}
 			}
-			catch (Exception exception)
+		}
+
+		private string ConnectionString
+		{
+			get
 			{
-				// Don't really care about the exception, just ignore
-				Trace.WriteLine("Exception message: " + exception.Message);
-				Trace.WriteLine("Exception InnerException: " + exception.InnerException);
-				Trace.WriteLine("Stack Trace follows:");
-				Trace.WriteLine(exception.StackTrace);
-				Trace.Flush();
-				string s = exception.Message;
+				if (SqlAuth)
+				{
+					return "Data Source=" + Server + ";Initial Catalog=" + Database + ";user id=" + UserName + ";password=" + Password + ";";
+				}
+				else
+				{
+					return "Data Source=" + Server + ";Initial Catalog=" + Database + ";Integrated Security=SSPI;";
+				}
+
 			}
 		}
 
 		#region IDisposable Members
 		public void Dispose()
 		{
-			if (connection != null)
-			{
-				connection.Dispose();
-				connection = null;
-			}
 		}
 		#endregion
 
@@ -111,7 +128,7 @@ namespace RightEdge.DataStorage
 				}
 			}
 
-			using (SqlConnection dbConnection = new SqlConnection(connectionString))
+			using (SqlConnection dbConnection = new SqlConnection(ConnectionString))
 			{
 				dbConnection.Open();
 
@@ -157,7 +174,7 @@ namespace RightEdge.DataStorage
 
 			try
 			{
-				dbConnection = new SqlConnection(connectionString);
+				dbConnection = new SqlConnection(ConnectionString);
 				dbConnection.Open();
 
 				string query = "SELECT COUNT(*) FROM BarData WHERE SymbolID = '" + symbolId + "'";
@@ -211,7 +228,7 @@ namespace RightEdge.DataStorage
 
 			try
 			{
-				dbConnection = new SqlConnection(connectionString);
+				dbConnection = new SqlConnection(ConnectionString);
 				dbConnection.Open();
 
 				SqlCommand command = new SqlCommand("DELETE FROM BarData WHERE SymbolID = '" + symbolId + "'", dbConnection);
@@ -255,8 +272,8 @@ namespace RightEdge.DataStorage
 
 		public bool IsProperlyConfigured()
 		{
-			if (server.Length == 0 ||
-				database.Length == 0)
+			if (Server.Length == 0 ||
+				Database.Length == 0)
 			{
 				return false;
 			}
@@ -267,39 +284,43 @@ namespace RightEdge.DataStorage
 		public void DoSettings()
 		{
 			SQLServerStoreSettings dlg = new SQLServerStoreSettings();
-			dlg.Server = server;
-			dlg.Database = database;
-			dlg.UserName = userName;
-			dlg.Password = password;
-			dlg.SqlAuth = sqlAuth;
+			dlg.Server = Server;
+			dlg.Database = Database;
+			dlg.UserName = UserName;
+			dlg.Password = Password;
+			dlg.SqlAuth = SqlAuth;
 
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
-				try
+				Server = dlg.Server;
+				Database = dlg.Database;
+				UserName = dlg.UserName;
+				Password = dlg.Password;
+				SqlAuth = dlg.SqlAuth;
+
+				if (_useRegistry)
 				{
-					server = dlg.Server;
-					database = dlg.Database;
-					userName = dlg.UserName;
-					password = dlg.Password;
-					sqlAuth = dlg.SqlAuth;
-					RegistryKey regKey = Registry.CurrentUser.CreateSubKey(@"Software\Yye Software");
-					RegistryKey serverKey = regKey.CreateSubKey("SQLServerDataStore", RegistryKeyPermissionCheck.ReadWriteSubTree);
-					serverKey.SetValue("Server", server);
-					serverKey.SetValue("Database", database);
-					serverKey.SetValue("LoginName", userName);
-					serverKey.SetValue("Password", password);
-					if (sqlAuth)
+					try
 					{
-						serverKey.SetValue("SQLAuth", true);
+						RegistryKey regKey = Registry.CurrentUser.CreateSubKey(@"Software\Yye Software");
+						RegistryKey serverKey = regKey.CreateSubKey("SQLServerDataStore", RegistryKeyPermissionCheck.ReadWriteSubTree);
+						serverKey.SetValue("Server", Server);
+						serverKey.SetValue("Database", Database);
+						serverKey.SetValue("LoginName", UserName);
+						serverKey.SetValue("Password", Password);
+						if (SqlAuth)
+						{
+							serverKey.SetValue("SQLAuth", true);
+						}
+						else
+						{
+							serverKey.SetValue("SQLAuth", false);
+						}
 					}
-					else
+					catch (Exception exception)
 					{
-						serverKey.SetValue("SQLAuth", false);
+						lastError = exception.Message;
 					}
-				}
-				catch (Exception exception)
-				{
-					lastError = exception.Message;
 				}
 			}
 		}
@@ -317,7 +338,7 @@ namespace RightEdge.DataStorage
 
 			try
 			{
-				dbConnection = new SqlConnection(connectionString);
+				dbConnection = new SqlConnection(ConnectionString);
 				dbConnection.Open();
 
 				SqlParameter symbolParam = new SqlParameter("@SymbolID", SqlDbType.NVarChar, 50);
@@ -517,7 +538,7 @@ namespace RightEdge.DataStorage
 
 			try
 			{
-				dbConnection = new SqlConnection(connectionString);
+				dbConnection = new SqlConnection(ConnectionString);
 				dbConnection.Open();
 
 				SqlCommand deleteCommand = new SqlCommand("DELETE FROM TickData WHERE SymbolId = @SymbolID", dbConnection);
@@ -544,7 +565,7 @@ namespace RightEdge.DataStorage
 			SqlConnection dbConnection = null;
 			try
 			{
-				dbConnection = new SqlConnection(connectionString);
+				dbConnection = new SqlConnection(ConnectionString);
 				dbConnection.Open();
 
 				InsertTick(dbConnection, null, tick, symbol.ToUniqueId());
@@ -574,7 +595,7 @@ namespace RightEdge.DataStorage
 
 			try
 			{
-				dbConnection = new SqlConnection(connectionString);
+				dbConnection = new SqlConnection(ConnectionString);
 				dbConnection.Open();
 
 				SqlTransaction transaction;
@@ -625,7 +646,7 @@ namespace RightEdge.DataStorage
 
 			try
 			{
-				dbConnection = new SqlConnection(connectionString);
+				dbConnection = new SqlConnection(ConnectionString);
 				dbConnection.Open();
 
 				string query = "SELECT * FROM TickData WHERE SymbolId = @SymbolId";
@@ -699,7 +720,7 @@ namespace RightEdge.DataStorage
 
 			try
 			{
-				dbConnection = new SqlConnection(connectionString);
+				dbConnection = new SqlConnection(ConnectionString);
 				dbConnection.Open();
 
 				SqlCommand deleteCommand = new SqlCommand("DELETE FROM TickData WHERE SymbolId = @SymbolID", dbConnection);

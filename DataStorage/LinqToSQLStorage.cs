@@ -16,44 +16,9 @@ using System.Data;
 
 namespace RightEdge.DataStorage
 {
-	public interface ILinqToSQLStorage
-	{
-		string ServerAddress { get; set; }
-		string Database { get; set; }
+	//	TODO: Automatically create database tables if database has been created but is empty
 
-		string UserName { get; set; }
-		string Password { get; set; }
-
-		TestConnectionResult TestConnection();
-		ReturnCode CreateDatabase();
-		ReturnCode UpgradeDatabase();
-
-		ILinqToSQLStorage Clone();
-	}
-
-	public enum ConnectionResult
-	{
-		Succeeded,
-		Failed,
-		ServerNotFound,
-		DatabaseNotFound,
-		DatabaseTablesNotCreated,
-		DatabaseNeedsConversion,
-		WrongDatabaseVersion
-	}
-
-	public class TestConnectionResult
-	{
-		public ConnectionResult Result { get; set; }
-		public ILinqToSQLStorage SuggestedSettings { get; set; }
-		public string AdditionalInformation { get; set; }
-	}
-
-	//	TODO: Better UI for Windows Authentication than just leaving username and password blank
-	//	TODO: Support backwards compatible mode with old database schema
-	//	TODO: Improve UI
-
-	[DisplayName("SQL Server Data Store (LINQ to SQL)")]
+	[DisplayName("SQL Server Data Store")]
 	[Description("Stores bar data and symbol information in a Microsoft SQL Server database.")]
 	[PluginEditor(typeof(LinqToSqlSettingsEditor))]
 	public sealed class LinqToSQLStorage : IDataStore, ILinqToSQLStorage
@@ -69,12 +34,22 @@ namespace RightEdge.DataStorage
 		public string UserName { get; set; }
 		public string Password { get; set; }
 
+		[DisplayName("Database Format")]
+		public DatabaseSchema DatabaseSchema { get; set; }
+
+		[DisplayName("Authentication Mode")]
+		public AuthenticationMode AuthenticationMode { get; set; }
+
+		private OldDataStoreWrapper _wrapper;
+
 		public LinqToSQLStorage()
 		{
 			ServerAddress = "(local)\\SQLEXPRESS";
 			Database = "RIGHTEDGE_DATA";
 			UserName = "";
 			Password = "";
+
+			AuthenticationMode = AuthenticationMode.Windows;
 		}
 
 		//  How to connect to a specific dbf file: Server=.\SQLExpress;AttachDbFilename=c:\mydbfile.mdf;Database=dbname;Trusted_Connection=Yes;
@@ -92,7 +67,7 @@ namespace RightEdge.DataStorage
 
 			builder.DataSource = ServerAddress;
 			builder.InitialCatalog = Database;
-			if (string.IsNullOrEmpty(UserName) && string.IsNullOrEmpty(Password))
+			if (UseIntegratedSecurity)
 			{
 				//	Use windows authentication
 				builder.IntegratedSecurity = true;
@@ -108,19 +83,64 @@ namespace RightEdge.DataStorage
 			return builder;
 		}
 
+		private bool UseIntegratedSecurity
+		{
+			get
+			{
+				return AuthenticationMode == AuthenticationMode.Windows;
+				//if (string.IsNullOrEmpty(UserName) && string.IsNullOrEmpty(Password))
+				//{
+				//    return true;
+				//}
+				//return false;
+			}
+		}
+
+		private OldDataStoreWrapper OldWrapper
+		{
+			get
+			{
+				if (_wrapper == null)
+				{
+					var oldPlugin = new SQLServerStorage(false);
+					oldPlugin.Server = ServerAddress;
+					oldPlugin.Database = Database;
+					oldPlugin.UserName = UserName;
+					oldPlugin.Password = Password;
+					oldPlugin.SqlAuth = !UseIntegratedSecurity;
+
+					_wrapper = new OldDataStoreWrapper();
+					_wrapper.OldStore = oldPlugin;
+				}
+				return _wrapper;
+			}
+		}
+
 		public IDataAccessor<BarData> GetBarStorage(SymbolFreq symbol)
 		{
+			if (DatabaseSchema == DatabaseSchema.BackwardsCompatible)
+			{
+				return OldWrapper.GetBarStorage(symbol);
+			}
 			return new LinqToSQLBarDataAccessor(ConnectionString, symbol);
 		}
 
 		public IDataAccessor<TickData> GetTickStorage(Symbol symbol)
 		{
+			if (DatabaseSchema == DatabaseSchema.BackwardsCompatible)
+			{
+				throw new NotSupportedException("Tick data storage not supported with the backwards compatible database format.  " + 
+					"You can upgrade to the new database format from the data store settings.");
+			}
 			return new LinqToSQLTickDataAccessor(ConnectionString, symbol);
 		}
 
 		public void FlushAll()
 		{
-
+			if (_wrapper != null)
+			{
+				OldWrapper.FlushAll();
+			}
 		}
 
 

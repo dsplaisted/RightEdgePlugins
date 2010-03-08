@@ -28,74 +28,65 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.propertyGrid = new System.Windows.Forms.PropertyGrid();
-			this.buttonTestConnection = new System.Windows.Forms.Button();
-			this.buttonCreateDatabase = new System.Windows.Forms.Button();
-			this.buttonUpgradeDatabase = new System.Windows.Forms.Button();
+			this.linkLabelTestConnection = new System.Windows.Forms.LinkLabel();
+			this.linkLabelCreateDatabase = new System.Windows.Forms.LinkLabel();
+			this.linkLabelUpgradeDatabase = new System.Windows.Forms.LinkLabel();
 			this.SuspendLayout();
 			// 
-			// propertyGrid
+			// linkLabelTestConnection
 			// 
-			this.propertyGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.propertyGrid.Location = new System.Drawing.Point(3, 3);
-			this.propertyGrid.Name = "propertyGrid";
-			this.propertyGrid.Size = new System.Drawing.Size(220, 215);
-			this.propertyGrid.TabIndex = 0;
+			this.linkLabelTestConnection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.linkLabelTestConnection.AutoSize = true;
+			this.linkLabelTestConnection.Location = new System.Drawing.Point(3, 265);
+			this.linkLabelTestConnection.Name = "linkLabelTestConnection";
+			this.linkLabelTestConnection.Size = new System.Drawing.Size(85, 13);
+			this.linkLabelTestConnection.TabIndex = 4;
+			this.linkLabelTestConnection.TabStop = true;
+			this.linkLabelTestConnection.Text = "Test Connection";
+			this.linkLabelTestConnection.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelTestConnection_LinkClicked);
 			// 
-			// buttonTestConnection
+			// linkLabelCreateDatabase
 			// 
-			this.buttonTestConnection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.buttonTestConnection.Location = new System.Drawing.Point(3, 224);
-			this.buttonTestConnection.Name = "buttonTestConnection";
-			this.buttonTestConnection.Size = new System.Drawing.Size(108, 23);
-			this.buttonTestConnection.TabIndex = 1;
-			this.buttonTestConnection.Text = "Test Connection";
-			this.buttonTestConnection.UseVisualStyleBackColor = true;
-			this.buttonTestConnection.Click += new System.EventHandler(this.buttonTestConnection_Click);
+			this.linkLabelCreateDatabase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.linkLabelCreateDatabase.AutoSize = true;
+			this.linkLabelCreateDatabase.Location = new System.Drawing.Point(3, 280);
+			this.linkLabelCreateDatabase.Name = "linkLabelCreateDatabase";
+			this.linkLabelCreateDatabase.Size = new System.Drawing.Size(87, 13);
+			this.linkLabelCreateDatabase.TabIndex = 5;
+			this.linkLabelCreateDatabase.TabStop = true;
+			this.linkLabelCreateDatabase.Text = "Create Database";
+			this.linkLabelCreateDatabase.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelCreateDatabase_LinkClicked);
 			// 
-			// buttonCreateDatabase
+			// linkLabelUpgradeDatabase
 			// 
-			this.buttonCreateDatabase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.buttonCreateDatabase.Location = new System.Drawing.Point(3, 253);
-			this.buttonCreateDatabase.Name = "buttonCreateDatabase";
-			this.buttonCreateDatabase.Size = new System.Drawing.Size(108, 23);
-			this.buttonCreateDatabase.TabIndex = 2;
-			this.buttonCreateDatabase.Text = "Create Database";
-			this.buttonCreateDatabase.UseVisualStyleBackColor = true;
-			this.buttonCreateDatabase.Click += new System.EventHandler(this.buttonCreateDatabase_Click);
-			// 
-			// buttonUpgradeDatabase
-			// 
-			this.buttonUpgradeDatabase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.buttonUpgradeDatabase.Location = new System.Drawing.Point(3, 282);
-			this.buttonUpgradeDatabase.Name = "buttonUpgradeDatabase";
-			this.buttonUpgradeDatabase.Size = new System.Drawing.Size(108, 23);
-			this.buttonUpgradeDatabase.TabIndex = 3;
-			this.buttonUpgradeDatabase.Text = "Upgrade Database";
-			this.buttonUpgradeDatabase.UseVisualStyleBackColor = true;
-			this.buttonUpgradeDatabase.Click += new System.EventHandler(this.buttonUpgradeDatabase_Click);
+			this.linkLabelUpgradeDatabase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.linkLabelUpgradeDatabase.AutoSize = true;
+			this.linkLabelUpgradeDatabase.Location = new System.Drawing.Point(3, 295);
+			this.linkLabelUpgradeDatabase.Name = "linkLabelUpgradeDatabase";
+			this.linkLabelUpgradeDatabase.Size = new System.Drawing.Size(169, 13);
+			this.linkLabelUpgradeDatabase.TabIndex = 6;
+			this.linkLabelUpgradeDatabase.TabStop = true;
+			this.linkLabelUpgradeDatabase.Text = "Upgrade Database to New Format";
+			this.linkLabelUpgradeDatabase.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelUpgradeDatabase_LinkClicked);
 			// 
 			// LinqToSqlSettingsEditor
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.buttonUpgradeDatabase);
-			this.Controls.Add(this.buttonCreateDatabase);
-			this.Controls.Add(this.buttonTestConnection);
-			this.Controls.Add(this.propertyGrid);
+			this.Controls.Add(this.linkLabelUpgradeDatabase);
+			this.Controls.Add(this.linkLabelCreateDatabase);
+			this.Controls.Add(this.linkLabelTestConnection);
 			this.Name = "LinqToSqlSettingsEditor";
 			this.Size = new System.Drawing.Size(226, 308);
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
 		#endregion
 
-		private System.Windows.Forms.PropertyGrid propertyGrid;
-		private System.Windows.Forms.Button buttonTestConnection;
-		private System.Windows.Forms.Button buttonCreateDatabase;
-		private System.Windows.Forms.Button buttonUpgradeDatabase;
+		private System.Windows.Forms.LinkLabel linkLabelTestConnection;
+		private System.Windows.Forms.LinkLabel linkLabelCreateDatabase;
+		private System.Windows.Forms.LinkLabel linkLabelUpgradeDatabase;
 	}
 }

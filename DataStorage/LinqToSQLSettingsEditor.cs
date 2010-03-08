@@ -7,16 +7,36 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using RightEdge.Common;
+using RightEdge.Shared;
 
 namespace RightEdge.DataStorage
 {
 	public partial class LinqToSqlSettingsEditor : UserControl, IPluginEditor
 	{
 		ILinqToSQLStorage _settings;
+		ISQLDataStoreSettingsEditor _editor;
 
 		public LinqToSqlSettingsEditor()
 		{
 			InitializeComponent();
+
+			//this.propertyGrid = new System.Windows.Forms.PropertyGrid();
+			_editor = SQLDataStoreSettingsUtil.CreatePropertyGrid();
+
+			Control propertyGrid = (Control)_editor;
+
+			propertyGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			propertyGrid.Location = new System.Drawing.Point(3, 3);
+
+			int top = linkLabelTestConnection.Top - 5;
+			int height = top - propertyGrid.Top;
+
+			propertyGrid.Size = new System.Drawing.Size(220, height);
+			propertyGrid.TabIndex = 0;
+
+			this.Controls.Add(propertyGrid);
 		}
 
 		#region IPluginEditor Members
@@ -24,7 +44,8 @@ namespace RightEdge.DataStorage
 		public void ShowSettings(object plugin)
 		{
 			_settings = ((ILinqToSQLStorage)plugin).Clone();
-			propertyGrid.SelectedObject = _settings;
+			//propertyGrid.SelectedObject = _settings;
+			_editor.ShowSettings(_settings);
 		}
 
 		public object GetSettings()
@@ -34,7 +55,7 @@ namespace RightEdge.DataStorage
 
 		#endregion
 
-		private void buttonTestConnection_Click(object sender, EventArgs e)
+		private void linkLabelTestConnection_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
 			var result = _settings.TestConnection();
 			if (result.Result == ConnectionResult.Succeeded)
@@ -61,7 +82,7 @@ namespace RightEdge.DataStorage
 			}
 		}
 
-		private void buttonCreateDatabase_Click(object sender, EventArgs e)
+		private void linkLabelCreateDatabase_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
 			ReturnCode ret = _settings.CreateDatabase();
 			if (ret.Success)
@@ -74,7 +95,7 @@ namespace RightEdge.DataStorage
 			}
 		}
 
-		private void buttonUpgradeDatabase_Click(object sender, EventArgs e)
+		private void linkLabelUpgradeDatabase_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
 			UpgradeDatabase();
 		}
@@ -84,6 +105,12 @@ namespace RightEdge.DataStorage
 			ReturnCode ret = _settings.UpgradeDatabase();
 			if (ret.Success)
 			{
+				if (_settings.DatabaseSchema == DatabaseSchema.BackwardsCompatible)
+				{
+					_settings.DatabaseSchema = DatabaseSchema.Default;
+					_editor.ShowSettings(_settings);
+				}
+
 				MessageBox.Show(this, "Database upgraded successfully.", "Success");
 			}
 			else
