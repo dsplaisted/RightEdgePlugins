@@ -476,7 +476,7 @@ GO";
 		protected abstract DateTime GetItemTime(T item);
 
 		protected abstract T ConvertToRightEdgeType(DBType item);
-		protected abstract DBType ConvertToDBType(SQLDataContext context, T item, int order);
+		protected abstract DBType ConvertToDBType(SQLDataContext context, T item, int order, DBSymbol dbSymbol);
 
 		protected abstract void InsertOnSubmit(SQLDataContext context, DBType item);
 		protected abstract void InternalDelete(DateTime start, DateTime end);
@@ -555,33 +555,36 @@ GO";
 
 			InternalDelete(start, end);
 
-			using (var context = GetContext())
+			using (new TimeOperation("Overall save"))
 			{
-				DBSymbol dbSymbol = GetSymbol(context, true);
-
-				DateTime lastDate = DateTime.MinValue;
-				int order = 0;
-				foreach (var item in items)
+				using (var context = GetContext())
 				{
-					if (GetItemTime(item) == lastDate)
-					{
-						order++;
-					}
-					else
-					{
-						order = 0;
-					}
-					DBType dbItem = ConvertToDBType(context, item, order);
-					lastDate = GetItemTime(item);
+					DBSymbol dbSymbol = GetSymbol(context, true);
 
-					InsertOnSubmit(context, dbItem);
-				}
+					DateTime lastDate = DateTime.MinValue;
+					int order = 0;
+					foreach (var item in items)
+					{
+						if (GetItemTime(item) == lastDate)
+						{
+							order++;
+						}
+						else
+						{
+							order = 0;
+						}
+						DBType dbItem = ConvertToDBType(context, item, order, dbSymbol);
+						lastDate = GetItemTime(item);
 
-				using (new TimeOperation("Submit save"))
-				{
-					context.SubmitChanges();
+						InsertOnSubmit(context, dbItem);
+					}
+
+					using (new TimeOperation("Submit save"))
+					{
+						context.SubmitChanges();
+					}
+					return items.Count;
 				}
-				return items.Count;
 			}
 		}
 
@@ -664,7 +667,7 @@ GO";
 			return bar;
 		}
 
-		protected override DBBar ConvertToDBType(SQLDataContext context, BarData bar, int order)
+		protected override DBBar ConvertToDBType(SQLDataContext context, BarData bar, int order, DBSymbol dbSymbol)
 		{
 			DBBar b = new DBBar();
 			b.Frequency = _frequency;
@@ -678,7 +681,7 @@ GO";
 			b.Volume = (long)bar.Volume;
 			b.OpenInterest = bar.OpenInterest;
 			b.EmptyBar = bar.EmptyBar;
-			b.DBSymbol = GetSymbol(context, true);
+			b.DBSymbol = dbSymbol;
 			b.Order = order;
 
 			return b;
@@ -755,10 +758,10 @@ GO";
 			return ret;
 		}
 
-		protected override DBTick ConvertToDBType(SQLDataContext context, TickData tick, int order)
+		protected override DBTick ConvertToDBType(SQLDataContext context, TickData tick, int order, DBSymbol dbSymbol)
 		{
 			DBTick dbTick = new DBTick();
-			dbTick.DBSymbol = GetSymbol(context, true);
+			dbTick.DBSymbol = dbSymbol;
 			dbTick.Time = tick.time;
 			dbTick.Order = order;
 			dbTick.TickType = (int)tick.tickType;
