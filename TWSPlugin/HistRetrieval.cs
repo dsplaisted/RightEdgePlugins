@@ -72,7 +72,6 @@ namespace RightEdge.TWSCSharpPlugin
 				dataType = HistoricalDataType.Bid;
 			}
 
-
 			id = twsPlugin.nextID++;
 			client.RequestHistoricalData(id, contract, endDate, Duration, barSize, dataType, RTHOnly ? 1 : 0);
 			requestCount++;

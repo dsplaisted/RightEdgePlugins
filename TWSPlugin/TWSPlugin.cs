@@ -2025,6 +2025,7 @@ namespace RightEdge.TWSCSharpPlugin
 		public Contract ToContract()
 		{
 			Contract ret = new Contract(0, Symbol, SecType, Expiry, Strike, Right, Multiplier, Exchange, Currency, "", PrimaryExchange);
+			ret.IncludeExpired = true;
 			return ret;
 		}
 
