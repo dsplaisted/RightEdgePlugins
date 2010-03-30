@@ -136,7 +136,10 @@ namespace RightEdge.DataStorage
 
 			public long Save(IList<T> items)
 			{
-				return _database.SaveItems(_filename, items);
+				//using (new TimeOperation("Total save (Binary store)"))
+				{
+					return _database.SaveItems(_filename, items);
+				}
 			}
 
 			public long Delete(DateTime start, DateTime end)

@@ -476,10 +476,15 @@ GO";
 		protected abstract DateTime GetItemTime(T item);
 
 		protected abstract T ConvertToRightEdgeType(DBType item);
-		protected abstract DBType ConvertToDBType(SQLDataContext context, T item, int order, DBSymbol dbSymbol);
+		//protected abstract DBType ConvertToDBType(SQLDataContext context, T item, int order, DBSymbol dbSymbol);
 
-		protected abstract void InsertOnSubmit(SQLDataContext context, DBType item);
+		protected abstract System.Collections.IEnumerable GetDataReaderItems(IEnumerable<T> items, Guid symbolGuid);
+
+		//protected abstract void InsertOnSubmit(SQLDataContext context, DBType item);
+		
 		protected abstract void InternalDelete(DateTime start, DateTime end);
+
+		protected abstract string TableName { get; }
 
 		protected DateTime MakeValidSQLDate(DateTime date)
 		{
@@ -543,6 +548,7 @@ GO";
 
 		}
 
+		//	How to speed up inserts: http://stackoverflow.com/questions/334919/mass-insert-into-sql-server
 		public long Save(IList<T> items)
 		{
 			items = items.OrderBy(i => GetItemTime(i)).ToList();
@@ -557,33 +563,27 @@ GO";
 
 			using (new TimeOperation("Overall save"))
 			{
+				Guid symbolGuid;
 				using (var context = GetContext())
 				{
 					DBSymbol dbSymbol = GetSymbol(context, true);
+					symbolGuid = dbSymbol.SymbolGuid;
+				}
 
-					DateTime lastDate = DateTime.MinValue;
-					int order = 0;
-					foreach (var item in items)
+				using (var conn = new SqlConnection(this._connectionString))
+				{
+					conn.Open();
+
+					using (var s = new SqlBulkCopy(conn))
 					{
-						if (GetItemTime(item) == lastDate)
-						{
-							order++;
-						}
-						else
-						{
-							order = 0;
-						}
-						DBType dbItem = ConvertToDBType(context, item, order, dbSymbol);
-						lastDate = GetItemTime(item);
+						s.DestinationTableName = TableName;
 
-						InsertOnSubmit(context, dbItem);
-					}
+						s.WriteToServer(new EnumerableDataReader(GetDataReaderItems(items, symbolGuid)));
 
-					using (new TimeOperation("Submit save"))
-					{
-						context.SubmitChanges();
+						s.Close();
+
+						return items.Count;
 					}
-					return items.Count;
 				}
 			}
 		}
@@ -602,27 +602,7 @@ GO";
 		{
 		}
 
-		protected class TimeOperation : IDisposable
-		{
-			string _name;
-			Stopwatch _stopwatch;
-			public TimeOperation(string name)
-			{
-				_name = name;
-				_stopwatch = new Stopwatch();
-				_stopwatch.Start();
-			}
 
-			#region IDisposable Members
-
-			public void Dispose()
-			{
-				_stopwatch.Stop();
-				Debug.WriteLine(string.Format("{0}: {1}", _name, _stopwatch.Elapsed));
-			}
-
-			#endregion
-		}
 	}
 
 	sealed class LinqToSQLBarDataAccessor : LinqToSQLDataAccessor<BarData, DBBar>
@@ -667,29 +647,93 @@ GO";
 			return bar;
 		}
 
-		protected override DBBar ConvertToDBType(SQLDataContext context, BarData bar, int order, DBSymbol dbSymbol)
-		{
-			DBBar b = new DBBar();
-			b.Frequency = _frequency;
-			b.BarStartTime = MakeValidSQLDate(bar.BarStartTime);
-			b.Open = bar.Open;
-			b.Close = bar.Close;
-			b.High = bar.High;
-			b.Low = bar.Low;
-			b.Bid = bar.Bid;
-			b.Ask = bar.Ask;
-			b.Volume = (long)bar.Volume;
-			b.OpenInterest = bar.OpenInterest;
-			b.EmptyBar = bar.EmptyBar;
-			b.DBSymbol = dbSymbol;
-			b.Order = order;
+		//protected override DBBar ConvertToDBType(SQLDataContext context, BarData bar, int order, DBSymbol dbSymbol)
+		//{
+		//    DBBar b = new DBBar();
+		//    b.Frequency = _frequency;
+		//    b.BarStartTime = MakeValidSQLDate(bar.BarStartTime);
+		//    b.Open = bar.Open;
+		//    b.Close = bar.Close;
+		//    b.High = bar.High;
+		//    b.Low = bar.Low;
+		//    b.Bid = bar.Bid;
+		//    b.Ask = bar.Ask;
+		//    b.Volume = (long)bar.Volume;
+		//    b.OpenInterest = bar.OpenInterest;
+		//    b.EmptyBar = bar.EmptyBar;
+		//    b.DBSymbol = dbSymbol;
+		//    b.Order = order;
 
-			return b;
+		//    return b;
+		//}
+
+
+		//protected override void InsertOnSubmit(SQLDataContext context, DBBar item)
+		//{
+		//    context.DBBars.InsertOnSubmit(item);
+		//}
+
+		protected override string TableName
+		{
+			get { return "Bar"; }
 		}
 
-		protected override void InsertOnSubmit(SQLDataContext context, DBBar item)
+		private class DataReaderBar
 		{
-			context.DBBars.InsertOnSubmit(item);
+			public Guid SymbolGuid { get; set; }
+			public int Frequency { get; set; }
+			public DateTime BarStartTime { get; set; }
+			public int Order { get; set; }
+			public double Open { get; set; }
+			public double Close { get; set; }
+			public double High { get; set; }
+			public double Low { get; set; }
+			public double Bid { get; set; }
+			public double Ask { get; set; }
+			public long Volume { get; set; }
+			public int OpenInterest { get; set; }
+			public bool EmptyBar { get; set; }
+		}
+
+		protected override System.Collections.IEnumerable GetDataReaderItems(IEnumerable<BarData> items, Guid symbolGuid)
+		{
+			return GetDataReaderBars(items, symbolGuid);
+		}
+
+		private IEnumerable<DataReaderBar> GetDataReaderBars(IEnumerable<BarData> bars, Guid symbolGuid)
+		{
+			DateTime lastDate = DateTime.MinValue;
+			int order = 0;
+			foreach (var b in bars)
+			{
+				if (b.BarStartTime == lastDate)
+				{
+					order++;
+				}
+				else
+				{
+					order = 0;
+				}
+
+				var drb = new DataReaderBar();
+
+				drb.SymbolGuid = symbolGuid;
+				drb.Frequency = _frequency;
+				drb.BarStartTime = b.BarStartTime;
+				drb.Order = order;
+				drb.Open = b.Open;
+				drb.Close = b.Close;
+				drb.High = b.High;
+				drb.Low = b.Low;
+				drb.Bid = b.Bid;
+				drb.Ask = b.Ask;
+				drb.Volume = (long) b.Volume;
+				drb.OpenInterest = b.OpenInterest;
+				drb.EmptyBar = b.EmptyBar;
+
+				yield return drb;
+				lastDate = b.BarStartTime;
+			}
 		}
 
 		//	TODO: Figure out how to make the Stored procedure call part of the transaction, so that when saving, the delete/add is part of the same transaction
@@ -758,22 +802,71 @@ GO";
 			return ret;
 		}
 
-		protected override DBTick ConvertToDBType(SQLDataContext context, TickData tick, int order, DBSymbol dbSymbol)
-		{
-			DBTick dbTick = new DBTick();
-			dbTick.DBSymbol = dbSymbol;
-			dbTick.Time = tick.time;
-			dbTick.Order = order;
-			dbTick.TickType = (int)tick.tickType;
-			dbTick.Price = tick.price;
-			dbTick.Size = (long) tick.size;
+		//protected override DBTick ConvertToDBType(SQLDataContext context, TickData tick, int order, DBSymbol dbSymbol)
+		//{
+		//    DBTick dbTick = new DBTick();
+		//    dbTick.DBSymbol = dbSymbol;
+		//    dbTick.Time = tick.time;
+		//    dbTick.Order = order;
+		//    dbTick.TickType = (int)tick.tickType;
+		//    dbTick.Price = tick.price;
+		//    dbTick.Size = (long) tick.size;
 
-			return dbTick;
+		//    return dbTick;
+		//}
+
+		//protected override void InsertOnSubmit(SQLDataContext context, DBTick item)
+		//{
+		//    context.DBTicks.InsertOnSubmit(item);
+		//}
+
+		protected override string TableName
+		{
+			get { return "Tick"; }
 		}
 
-		protected override void InsertOnSubmit(SQLDataContext context, DBTick item)
+		private class DataReaderTick
 		{
-			context.DBTicks.InsertOnSubmit(item);
+			public Guid SymbolGuid { get; set; }
+			public DateTime Time { get; set; }
+			public int Order { get; set; }
+			public int TickType { get; set; }
+			public double Price { get; set; }
+			public long Size { get; set; }
+		}
+
+		protected override System.Collections.IEnumerable GetDataReaderItems(IEnumerable<TickData> items, Guid symbolGuid)
+		{
+			return GetDataReaderTicks(items, symbolGuid);
+		}
+
+		private IEnumerable<DataReaderTick> GetDataReaderTicks(IEnumerable<TickData> ticks, Guid symbolGuid)
+		{
+			DateTime lastDate = DateTime.MinValue;
+			int order = 0;
+			foreach (var t in ticks)
+			{
+				if (t.time == lastDate)
+				{
+					order++;
+				}
+				else
+				{
+					order = 0;
+				}
+
+				var drt = new DataReaderTick();
+
+				drt.SymbolGuid = symbolGuid;
+				drt.Time = t.time;
+				drt.Order = order;
+				drt.TickType = (int)t.tickType;
+				drt.Price = t.price;
+				drt.Size = (long)t.size;
+
+				yield return drt;
+				lastDate = t.time;
+			}
 		}
 
 
