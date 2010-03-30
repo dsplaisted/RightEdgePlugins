@@ -637,36 +637,43 @@ namespace RightEdge.TWSCSharpPlugin
 
 					
 					RightEdge.Common.BrokerOrder order;
-					string information = "";
 					if (openOrders.TryGetValue(e.TickerId.ToString(), out order))
 					{
+						string message = string.Format("IB error/warning code {0}: {1}", errorCode, e.ErrorMsg);
+						bool bError = true;
+
 						if (errorCode >= 2100 && errorCode <= 3000)
 						{
+							//	Error code 2109 can happen often and is apparently just noise.
+							//	The error text for error 2109 is: Order Event Warning: Attribute “Outside Regular Trading Hours” is ignored based on the order type and destination. PlaceOrder is now processed
 							if (errorCode != 2109)
 							{
 								//	It's probably just a warning, and the order may continue
 								Console.WriteLine("IB Warning code " + errorCode + " for order ID " + e.TickerId + ": " + e.ErrorMsg);
 							}
-							return;
+							bError = false;
+						}
+						else if (errorCode == 404)
+						{
+							//	404: Shares for this order are not immediately available for short sale. The order will be held while we attempt to locate the shares.
+							bError = false;
 						}
 
-						string message = string.Format("Error code {0}: {1}", errorCode, e.ErrorMsg);
+						//string message = string.Format("Error code {0}: {1}", errorCode, e.ErrorMsg);
 
 						// error code 202 is a cancelled order ... we want to know about these!
 						if (errorCode == 202)
 						{
 							order.OrderState = BrokerOrderState.Cancelled;
-							information = message;
 						}
-						else
+						else if (bError)
 						{
 							order.OrderState = BrokerOrderState.Rejected;
-							information = message;
 						}
 						OrderUpdatedDelegate tmp = OrderUpdated;
 						if (tmp != null)
 						{
-							tmp(order, null, information);
+							tmp(order, null, message);
 						}
 						return;
 					}
@@ -2025,7 +2032,11 @@ namespace RightEdge.TWSCSharpPlugin
 		public Contract ToContract()
 		{
 			Contract ret = new Contract(0, Symbol, SecType, Expiry, Strike, Right, Multiplier, Exchange, Currency, "", PrimaryExchange);
-			ret.IncludeExpired = true;
+			if (!string.IsNullOrEmpty(Expiry))
+			{
+				ret.IncludeExpired = true;
+			}
+
 			return ret;
 		}
 
