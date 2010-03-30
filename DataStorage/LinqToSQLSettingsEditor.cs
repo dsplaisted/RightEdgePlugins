@@ -50,6 +50,7 @@ namespace RightEdge.DataStorage
 
 		public object GetSettings()
 		{
+			_editor.CommitChanges();
 			return _settings;
 		}
 
