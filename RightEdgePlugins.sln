@@ -9,9 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TWSCSharpPlugin", "TWSPlugi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStorage", "DataStorage\DataStorage.csproj", "{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenECry", "OpenECry\OpenECry.csproj", "{F5B0FDE4-B338-4AD1-9E43-570110FD1858}"
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccProjectUniqueName0 = IQFeed\\IQFeed.csproj
 		SccProjectName0 = $/RightEdge2008\u0020Edition\u00202
 		SccLocalPath0 = IQFeed
@@ -31,6 +33,11 @@ Global
 		SccProjectName3 = $/RightEdge2008\u0020Edition\u00202/DataStorage
 		SccLocalPath3 = DataStorage
 		SccProvider3 = MSSCCI:SourceGear\u0020Vault\u0020Client
+		CanCheckoutShared = false
+		SccProjectUniqueName4 = OpenECry\\OpenECry.csproj
+		SccProjectName4 = $/RightEdge2008\u0020Edition\u00202/OpenECry
+		SccLocalPath4 = OpenECry
+		SccProvider4 = MSSCCI:SourceGear\u0020Vault\u0020Client
 		CanCheckoutShared = false
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +61,10 @@ Global
 		{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89D39AA4-3860-41E5-8823-E4C3E8CD9A7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5B0FDE4-B338-4AD1-9E43-570110FD1858}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5B0FDE4-B338-4AD1-9E43-570110FD1858}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5B0FDE4-B338-4AD1-9E43-570110FD1858}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5B0FDE4-B338-4AD1-9E43-570110FD1858}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
