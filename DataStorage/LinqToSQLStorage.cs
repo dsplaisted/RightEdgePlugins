@@ -570,20 +570,17 @@ GO";
 					symbolGuid = dbSymbol.SymbolGuid;
 				}
 
-				using (var conn = new SqlConnection(this._connectionString))
+
+				using (var s = new SqlBulkCopy(this._connectionString, SqlBulkCopyOptions.TableLock))
 				{
-					conn.Open();
+					s.DestinationTableName = TableName;
+					s.BatchSize = 5000;
 
-					using (var s = new SqlBulkCopy(conn))
-					{
-						s.DestinationTableName = TableName;
+					s.WriteToServer(new EnumerableDataReader(GetDataReaderItems(items, symbolGuid)));
 
-						s.WriteToServer(new EnumerableDataReader(GetDataReaderItems(items, symbolGuid)));
+					s.Close();
 
-						s.Close();
-
-						return items.Count;
-					}
+					return items.Count;
 				}
 			}
 		}
