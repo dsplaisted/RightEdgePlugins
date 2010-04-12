@@ -15,6 +15,8 @@ namespace OpenECry
 	public class OECPlugin : IService, ITickRetrieval, /*IBarDataRetrieval,*/ IBroker
 	{
 		private string serverAddress = "api.openecry.com";
+		//private string serverAddress = "prod.openecry.com";
+
 		private int port = 9200;
 		private string userName = "";
 		private string password = "";
