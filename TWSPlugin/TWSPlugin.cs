@@ -173,7 +173,10 @@ namespace RightEdge.TWSCSharpPlugin
 				data.time = GetAccountTime("price tick");
 				data.price = (double)e.Price;
 
-				if (data.price <= 0)
+				if (data.price <= 0 &&
+					symbol.AssetClass != AssetClass.Future &&
+					symbol.AssetClass != AssetClass.Option &&
+					symbol.AssetClass != AssetClass.FuturesOption)
 				{
 					//	GBP/USD was getting bid and ask ticks with a price of zero, so ignore these.
 					//	4/20/2010 - A user reported various forex symbols were getting negative prices, so these will also be ignored
