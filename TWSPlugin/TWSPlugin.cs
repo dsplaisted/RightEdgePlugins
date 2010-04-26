@@ -662,6 +662,14 @@ namespace RightEdge.TWSCSharpPlugin
 							//	404: Shares for this order are not immediately available for short sale. The order will be held while we attempt to locate the shares.
 							bError = false;
 						}
+						else if (errorCode == 399)
+						{
+							//	Order Message: Warning: your order will not be placed at the exchange until 2010-04-22 09:30:00 US/Eastern
+							if (e.ErrorMsg.StartsWith("Order Message: Warning: your order will not be placed at the exchange until"))
+							{
+								bError = false;
+							}
+						}
 
 						//string message = string.Format("Error code {0}: {1}", errorCode, e.ErrorMsg);
 
