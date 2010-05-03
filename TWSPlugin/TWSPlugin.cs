@@ -664,8 +664,8 @@ namespace RightEdge.TWSCSharpPlugin
 						}
 						else if (errorCode == 399)
 						{
-							//	Order Message: Warning: your order will not be placed at the exchange until 2010-04-22 09:30:00 US/Eastern
-							if (e.ErrorMsg.StartsWith("Order Message: Warning: your order will not be placed at the exchange until"))
+							//	Order Message:\nWarning: your order will not be placed at the exchange until 2010-04-22 09:30:00 US/Eastern
+							if (e.ErrorMsg.StartsWith("Order Message:\nWarning: your order will not be placed at the exchange until"))
 							{
 								bError = false;
 							}
