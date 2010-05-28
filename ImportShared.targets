@@ -3,7 +3,7 @@
   <ItemGroup>
     <Reference Include="RightEdge.Shared, Version=2010.1.0.0, Culture=neutral, PublicKeyToken=13180b1fea4a4bf9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\RightEdge.Shared.dll</HintPath>
+      <HintPath>..\RightEdge.Shared.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

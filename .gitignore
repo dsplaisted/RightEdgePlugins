@@ -26,6 +26,10 @@ _sgbak/
 
 # Don't automatically add .sln files
 *.sln
+
+# Don't automatically add DLLs
+*.DLL
+*.dll
  
 # Other useful stuff
 *.bak

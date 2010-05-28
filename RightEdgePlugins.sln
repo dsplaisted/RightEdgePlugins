@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQFeed", "IQFeed\IQFeed.csproj", "{C96A1E78-3E5C-4C55-814C-3C9CB6B1ACA9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KRS.ATS.IBNet", "KRS.ATS.IBNet\KRS.ATS.IBNet.csproj", "{D71E6924-6AFE-4E54-BE66-C5FDB425429E}"

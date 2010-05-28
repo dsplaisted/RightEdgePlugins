@@ -6,7 +6,7 @@
   <ItemGroup>
     <Reference Include="Common, Version=2010.1.0.0, Culture=neutral, PublicKeyToken=825834b19e38a0a8, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Common.dll</HintPath>
+      <HintPath>..\Common.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
