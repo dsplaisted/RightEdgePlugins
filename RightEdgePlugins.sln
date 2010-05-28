@@ -11,34 +11,35 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStorage", "DataStorage\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenECry", "OpenECry\OpenECry.csproj", "{F5B0FDE4-B338-4AD1-9E43-570110FD1858}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Optimization", "Optimization\Optimization.csproj", "{0EDE8D8F-82C8-4CA8-971A-0AA6A6E00B02}"
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccProjectUniqueName0 = IQFeed\\IQFeed.csproj
 		SccProjectName0 = $/RightEdge2008\u0020Edition\u00202
 		SccLocalPath0 = IQFeed
 		SccProvider0 = MSSCCI:SourceGear\u0020Vault\u0020Client
-		CanCheckoutShared = false
 		SccProjectUniqueName1 = KRS.ATS.IBNet\\KRS.ATS.IBNet.csproj
 		SccProjectName1 = $/RightEdge2008\u0020Edition\u00202/KRS.ATS.IBNet
 		SccLocalPath1 = KRS.ATS.IBNet
 		SccProvider1 = MSSCCI:SourceGear\u0020Vault\u0020Client
-		CanCheckoutShared = false
 		SccProjectUniqueName2 = TWSPlugin\\TWSCSharpPlugin.csproj
 		SccProjectName2 = $/RightEdge2008\u0020Edition\u00202/TWSCSharpPlugin
 		SccLocalPath2 = TWSPlugin
 		SccProvider2 = MSSCCI:SourceGear\u0020Vault\u0020Client
-		CanCheckoutShared = false
 		SccProjectUniqueName3 = DataStorage\\DataStorage.csproj
 		SccProjectName3 = $/RightEdge2008\u0020Edition\u00202/DataStorage
 		SccLocalPath3 = DataStorage
 		SccProvider3 = MSSCCI:SourceGear\u0020Vault\u0020Client
-		CanCheckoutShared = false
 		SccProjectUniqueName4 = OpenECry\\OpenECry.csproj
 		SccProjectName4 = $/RightEdge2008\u0020Edition\u00202/OpenECry
 		SccLocalPath4 = OpenECry
 		SccProvider4 = MSSCCI:SourceGear\u0020Vault\u0020Client
-		CanCheckoutShared = false
+		SccProjectUniqueName5 = Optimization\\Optimization.csproj
+		SccProjectName5 = $/RightEdge2008\u0020Edition\u00202
+		SccLocalPath5 = Optimization
+		SccProvider5 = MSSCCI:SourceGear\u0020Vault\u0020Client
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +66,10 @@ Global
 		{F5B0FDE4-B338-4AD1-9E43-570110FD1858}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5B0FDE4-B338-4AD1-9E43-570110FD1858}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5B0FDE4-B338-4AD1-9E43-570110FD1858}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EDE8D8F-82C8-4CA8-971A-0AA6A6E00B02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EDE8D8F-82C8-4CA8-971A-0AA6A6E00B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EDE8D8F-82C8-4CA8-971A-0AA6A6E00B02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EDE8D8F-82C8-4CA8-971A-0AA6A6E00B02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
