@@ -13,7 +13,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyProduct("RightEdge")]
 [assembly: AssemblyCopyright("Copyright © Yye Software 2006-2010")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]		
+[assembly: AssemblyCulture("")]
 
 //
 // Version information for an assembly consists of the following four values:
