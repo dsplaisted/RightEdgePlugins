@@ -1817,8 +1817,7 @@ namespace RightEdge.TWSCSharpPlugin
 					//apiOrder.GoodTillDate = gtcDate.ToString("yyyyMMdd");
 					//apiOrder.GoodTillDate = "";
 					apiOrder.GoodTillDate = "GTC";
-					//	TODO: is this better?
-					//apiOrder.Tif = TimeInForce.GoodTillCancel;
+					apiOrder.Tif = TimeInForce.GoodTillCancel;
 				}
 
 				apiOrder.TotalQuantity = (int)order.Shares;
